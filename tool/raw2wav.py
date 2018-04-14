@@ -2,6 +2,7 @@
 import os
 import sys
 import numpy as np
+import string
 from scipy.io.wavfile import write
 
 SAMPLE_RATE = 2000 # hz
@@ -11,20 +12,30 @@ def get_argv_params():
 
     if len(sys.argv) != 3:
         print("Usage: ./raw2wav.py input output.wav")
-        raise Exception("Invalid input parameters")
+        sys.exit(-1)
 
     fin_path, fout_path = sys.argv[1:3]
     if not os.path.exists(fin_path):
-        raise Exception("Input file not found")
+        sys.exit(-1)
 
     return fin_path, fout_path
 
 def get_raw_data(fin_path):
     arr = []
+    count = 0
     with open(fin_path) as fin:
         for line in fin:
-            arr.append(int(line, 16))
+            line = line.strip()
+            if len(line) != 4:
+                count += 1
+                continue
+            try:
+                arr.append(int(line, 16))
+            except Exception:
+                import pdb; pdb.set_trace()
+
     data = np.array(arr)
+    print("Ignored line number is %d for %s" % (count, fin_path))
     # Normalization
     return (data - RANGE/2) / (RANGE/2)
 

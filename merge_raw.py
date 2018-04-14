@@ -25,7 +25,11 @@ def merge_dir(input_dir, output_filepath):
         if not os.path.exists(input_filepath):
             break
         with open(input_filepath) as fin:
-            data += fin.read()
+            for line in fin:
+                line = line.strip()
+                if len(line) != 4:
+                    continue
+                data += (line + "\n")
 
     mkdir(os.path.dirname(output_filepath))
     with open(output_filepath, "w") as fout:

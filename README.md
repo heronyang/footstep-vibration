@@ -1,4 +1,4 @@
-# Vibration + Footprint
+# Vibration + Footstep
 
 ## Preprocessing
 
