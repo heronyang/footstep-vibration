@@ -4,9 +4,8 @@ import sys
 import numpy as np
 import itertools
 import matplotlib.pyplot as plt
-
-WINDOW_SIZE = 8000
-STEP_SIZE = 50
+from config import Config as cfg
+from preprocess import chop
 
 def main():
 
@@ -14,18 +13,19 @@ def main():
     input_pattern, input_test, output_file = get_io_files()
 
     # Loads data into numpy objects
-    pattern = load_data(input_pattern)[-WINDOW_SIZE:]   # trimmed
+    pattern = load_data(input_pattern)[-cfg.WINDOW_SIZE:]   # trimmed
     test = load_data(input_test)
-    test_segments = chop(test, WINDOW_SIZE, STEP_SIZE)
+    test_segments = np.array(chop(test, cfg.WINDOW_SIZE, cfg.STEP_SIZE))
 
     ##
-    distances = get_distances(pattern, test_segments)
-    save_plot(distances, output_file)
+    similarity = get_similarity(pattern, test_segments)
+    save_plot(similarity, output_file)
 
 def get_io_files():
 
     if len(sys.argv[1:]) != 3:
-        print("Usage: ./spot_event.py input_pattern input_test output_file")
+        print("Usage: ./spot_event_similarity.py " +\
+              "input_pattern input_test output_file")
         sys.exit(-1)
 
     input_pattern, input_test, output_file = sys.argv[1:]
@@ -41,26 +41,15 @@ def load_data(input_file):
         arr = [int(line.strip(), 16) for line in f]
     return np.array(arr)
 
-def chop(data, window_size, step_size):
 
-    left = 0
-    segments = []
+def get_similarity(pattern, segments):
+    return [-1 * np.linalg.norm(segment - pattern) for segment in segments]
 
-    while True:
-        right = left + window_size
-        if right >= len(data):
-            return np.array(segments)
-        segments.append(data[left:right])
-        left += step_size
-
-def get_distances(pattern, segments):
-    return [np.linalg.norm(segment - pattern) for segment in segments]
-
-def save_plot(arr, output_filepath):
+def save_plot(arr, output_file):
     plt.clf()
     plt.plot(arr)
-    plt.savefig(output_filepath)
-    print("Figure saved to %s" % output_filepath)
+    plt.savefig(output_file)
+    print("Figure saved to %s" % output_file)
 
 if __name__ == "__main__":
     main()
