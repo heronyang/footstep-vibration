@@ -2,6 +2,8 @@
 
 ## Preprocessing
 
-Merge multiple raw data located in `./data/` into one single file per test:
+    $ ./preprocess.py
 
-    $ ./merge_raw.py
+## Spot event
+
+    $ ./spot_event.py
