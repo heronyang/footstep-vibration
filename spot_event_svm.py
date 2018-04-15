@@ -22,8 +22,16 @@ def get_input():
     return X, y, X_test, y_test
 
 def main():
-    model = svm.SVC(kernel="linear", C=1, gamma=1)
+
     X, y, X_test, y_test = get_input()
+    model = svm.SVC(kernel="linear", C=1, gamma=1)
+
+    # Train
+    model.fit(X, y)
+
+    # Predict
+    y_predict = model.predict(X_test)
+    print("Correctness: %f" % ((y_test == y_predict).sum() / len(y_test)))
 
 if __name__ == "__main__":
     main()
