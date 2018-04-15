@@ -33,7 +33,8 @@ def generate_merged_files(input_dir, output_dir):
     for subdir in os.listdir(input_dir):
         print("Found %s" % subdir)
         for index in itertools.count():
-            input_subdir = input_dir + subdir + "/" + subdir + "-" + str(index + 1)
+            input_subdir = input_dir + subdir + "/" + subdir + "-" \
+                    + str(index + 1)
             output_file = "%s%s/%02d" % (output_dir, subdir, index + 1)
             if os.path.exists(input_subdir):
                 merge_dir(input_subdir, output_file)
