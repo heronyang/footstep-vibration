@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import itertools
+import shutil
 from tool.raw2wav import save_wav
 from config import Config as cfg
 
@@ -16,20 +17,28 @@ SINGLE_LONG_FALSE_DATA = ["long"]
 TRAIN_TEST_RATIO = 3
 
 def main():
+    clear_dir([DATA_MERGE_ROOT, WAVE_ROOT, PLOT_ROOT, TRAIN_ROOT, TEST_ROOT])
     generate_merged_files(DATA_ROOT, DATA_MERGE_ROOT)
     generate_wave_files(DATA_MERGE_ROOT, WAVE_ROOT)
     generate_plots(DATA_MERGE_ROOT, PLOT_ROOT)
     generate_train_test_data(DATA_MERGE_ROOT, TRAIN_ROOT, TEST_ROOT)
 
+def clear_dir(dir_list):
+    for d in dir_list:
+        if os.path.exists(d) and os.path.isdir(d):
+            shutil.rmtree(d)
+            print("Removed %s" % d)
+
 def generate_merged_files(input_dir, output_dir):
     for subdir in os.listdir(input_dir):
         print("Found %s" % subdir)
         for index in itertools.count():
-            input_dir = input_dir + subdir + "/" + subdir + "-" + str(index + 1)
+            input_subdir = input_dir + subdir + "/" + subdir + "-" + str(index + 1)
             output_file = "%s%s/%02d" % (output_dir, subdir, index + 1)
-            if os.path.exists(input_dir):
-                merge_dir(input_dir, output_file)
+            if os.path.exists(input_subdir):
+                merge_dir(input_subdir, output_file)
             else:
+                print("Exit %s" % subdir)
                 break
 
 def merge_dir(input_dir, output_file):
