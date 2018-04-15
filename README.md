@@ -4,6 +4,10 @@
 
     $ ./preprocess.py
 
-## Spot event
+## Spot event using Similarity
 
-    $ ./spot_event.py
+    $ ./spot_event_similarity.py
+
+## Spot event using SVM
+
+    $ ./spot_event_svm.py
