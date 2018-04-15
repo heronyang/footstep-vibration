@@ -21,7 +21,6 @@ def main():
     ##
     distances = get_distances(pattern, test_segments)
     save_plot(distances, output_file)
-    import pdb; pdb.set_trace()
 
 def get_io_files():
 
@@ -61,6 +60,7 @@ def save_plot(arr, output_filepath):
     plt.clf()
     plt.plot(arr)
     plt.savefig(output_filepath)
+    print("Figure saved to %s" % output_filepath)
 
 if __name__ == "__main__":
     main()
