@@ -2,6 +2,8 @@
 import os
 import itertools
 import shutil
+import numpy as np
+import random
 from tool.raw2wav import save_wav
 from config import Config as cfg
 
@@ -94,6 +96,10 @@ def generate_train_test_data(input_dir, train_root, test_root):
 
     # Reads data
     true_data, false_data = read_true_false_data(input_dir)
+    
+    # Shuffle
+    random.shuffle(true_data)
+    random.shuffle(false_data)
 
     # Writes into train/test data
     write_true_false_data(train_root, test_root, true_data, false_data)
@@ -149,6 +155,10 @@ def write_data_list_to_file(data_list, output_dir):
         with open(output_file, "w") as fout:
             fout.write("\n".join([str(d) for d in data]))
         print("%s saved" % output_file)
+
+    np_file = output_dir + "metric.txt"
+    np.savetxt(np_file, np.array(data_list), fmt="%d")
+    print("%s saved" % np_file)
 
 def chop(data, window_size, step_size):
 
