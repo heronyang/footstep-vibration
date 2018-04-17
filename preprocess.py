@@ -15,7 +15,7 @@ TRAIN_ROOT = "./svm/train/"
 TEST_ROOT = "./svm/test/"
 
 SINGLE_TRUE_DATA = ["heron", "harvey"]
-SINGLE_LONG_FALSE_DATA = ["long"]
+SINGLE_LONG_FALSE_DATA = ["uncontrol"]
 TRAIN_TEST_RATIO = 3
 
 def main():

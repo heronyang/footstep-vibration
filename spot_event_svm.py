@@ -28,10 +28,15 @@ def main():
 
     # Train
     model.fit(X, y)
+    y_predict = model.predict(X)
+    print("[Train] Correctness: %f" % ((y == y_predict).sum() / len(y)))
 
     # Predict
-    y_predict = model.predict(X_test)
-    print("Correctness: %f" % ((y_test == y_predict).sum() / len(y_test)))
+    y_test_predict = model.predict(X_test)
+    print("predict", y_test_predict)
+    print("truth", y_test)
+    print("[Test] Correctness: %f" %
+          ((y_test == y_test_predict).sum() / len(y_test)))
 
 if __name__ == "__main__":
     main()
