@@ -7,12 +7,13 @@ import random
 from tool.raw2wav import save_wav
 from config import Config as cfg
 
-DATA_ROOT = "./data/"
+DATA_ROOT = "./raw_data/"
 DATA_MERGE_ROOT = "./merged_data/"
 WAVE_ROOT = "./wave/"
 PLOT_ROOT = "./plot/"
 TRAIN_ROOT = "./svm/train/"
 TEST_ROOT = "./svm/test/"
+PROCESSED_DATA_ROOT = "./data/"
 
 SINGLE_TRUE_DATA = ["heron", "harvey"]
 SINGLE_LONG_FALSE_DATA = ["uncontrol"]
@@ -24,6 +25,7 @@ def main():
     generate_wave_files(DATA_MERGE_ROOT, WAVE_ROOT)
     generate_plots(DATA_MERGE_ROOT, PLOT_ROOT)
     generate_train_test_data(DATA_MERGE_ROOT, TRAIN_ROOT, TEST_ROOT)
+    generate_processed_data(DATA_MERGE_ROOT, PROCESSED_DATA_ROOT)
 
 def clear_dir(dir_list):
     for d in dir_list:
@@ -103,6 +105,25 @@ def generate_train_test_data(input_dir, train_root, test_root):
 
     # Writes into train/test data
     write_true_false_data(train_root, test_root, true_data, false_data)
+
+def generate_processed_data(input_dir, output_dir):
+
+    true_data, false_data = read_true_false_data(input_dir)
+    mkdir(output_dir)
+
+    # Shuffle
+    random.shuffle(true_data)
+    random.shuffle(false_data)
+
+    # Generates true data
+    output_true_file = output_dir + "1"
+    np.savetxt(output_true_file, np.array(true_data), fmt="%d")
+    print("%s saved" % output_true_file)
+
+    # Generates false data
+    output_false_file = output_dir + "0"
+    np.savetxt(output_false_file, np.array(false_data), fmt="%d")
+    print("%s saved" % output_false_file)
 
 def read_true_false_data(input_dir):
 
