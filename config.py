@@ -1,3 +1,4 @@
 class Config:
     WINDOW_SIZE = 6000
     STEP_SIZE = 500
+    TRAIN_TEST_RATIO = 0.75

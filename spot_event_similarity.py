@@ -1,55 +1,46 @@
 #!/usr/bin/env python3
-import os
-import sys
 import numpy as np
-import itertools
-import matplotlib.pyplot as plt
 from config import Config as cfg
-from preprocess import chop
+
+INPUT_DIR = "./data/"
 
 def main():
 
-    # Loads the input/output filepaths
-    input_pattern, input_test, output_file = get_io_files()
+    # Load all processed true/false data
+    x0 = np.loadtxt(INPUT_DIR + "0")
+    x1 = np.loadtxt(INPUT_DIR + "1")
 
-    # Loads data into numpy objects
-    pattern = load_data(input_pattern)[-cfg.WINDOW_SIZE:]   # trimmed
-    test = load_data(input_test)
-    test_segments = np.array(chop(test, cfg.WINDOW_SIZE, cfg.STEP_SIZE))
+    # Split x1 into trainign and test set.
+    splitter = int(len(x1) * cfg.TRAIN_TEST_RATIO)
+    x1_train, x1_test = x1[:splitter], x1[splitter:]
 
-    ##
-    similarity = get_similarity(pattern, test_segments)
-    save_plot(similarity, output_file)
+    # Gets the test data using partial x1 and x0 (1:1)
+    x_test = np.vstack((x1_test, x0[:len(x1_test)]))
+    y_test = np.array([1] * len(x1_test) + [0] * len(x1_test))
 
-def get_io_files():
+    # Predict
+    for threshold in range(20000, 60000, 500):
+        y_predict = predict(x_test, y_test, x1_train, threshold)
+        correctness = (y_predict == y_test).mean()
+        print("Threshold %d, correctness %f" % (threshold, correctness))
 
-    if len(sys.argv[1:]) != 3:
-        print("Usage: ./spot_event_similarity.py " +\
-              "input_pattern input_test output_file")
-        sys.exit(-1)
+def predict(x_test, y_test, x1_train, threshold):
 
-    input_pattern, input_test, output_file = sys.argv[1:]
+    if x_test.shape[0] != y_test.shape[0]:
+        raise Exception("Size mismatched")
+    
+    y_predict = []
+    for i in range(len(x_test)):
+        xi = x_test[i]
+        yi = y_test[i]
 
-    if not os.path.exists(input_pattern) or not os.path.exists(input_test):
-        print("Input file not is invalid")
-        sys.exit(-1)
+        simiarity = np.array([get_similarity(i, xi) for i in x1_train]).mean()
+        y_predict_i = 1 if simiarity > threshold else 0
+        y_predict.append(y_predict_i)
+    return np.array(y_predict)
 
-    return input_pattern, input_test, output_file
-
-def load_data(input_file):
-    with open(input_file) as f:
-        arr = [int(line.strip(), 16) for line in f]
-    return np.array(arr)
-
-
-def get_similarity(pattern, segments):
-    return [-1 * np.linalg.norm(segment - pattern) for segment in segments]
-
-def save_plot(arr, output_file):
-    plt.clf()
-    plt.plot(arr)
-    plt.savefig(output_file)
-    print("Figure saved to %s" % output_file)
+def get_similarity(pattern, segment):
+    return np.abs(np.linalg.norm(pattern - segment))
 
 if __name__ == "__main__":
     main()

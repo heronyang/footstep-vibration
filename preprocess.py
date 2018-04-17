@@ -17,7 +17,6 @@ PROCESSED_DATA_ROOT = "./data/"
 
 SINGLE_TRUE_DATA = ["heron", "harvey"]
 SINGLE_LONG_FALSE_DATA = ["uncontrol"]
-TRAIN_TEST_RATIO = 3
 
 def main():
     clear_dir([DATA_MERGE_ROOT, WAVE_ROOT, PLOT_ROOT, TRAIN_ROOT, TEST_ROOT])
@@ -155,10 +154,9 @@ def read_true_false_data(input_dir):
 
 def write_true_false_data(train_root, test_root, true_data, false_data):
 
-    true_data_splitter = int(len(true_data) * \
-                             (TRAIN_TEST_RATIO / (TRAIN_TEST_RATIO + 1)))
-    false_data_splitter = int(len(false_data) * \
-                             (TRAIN_TEST_RATIO / (TRAIN_TEST_RATIO + 1)))
+    # Gets the splitter index
+    true_data_splitter = int(len(true_data) * cfg.TRAIN_TEST_RATIO)
+    false_data_splitter = int(len(false_data) * cfg.TRAIN_TEST_RATIO)
 
     # Writes train data
     write_data_list_to_file(true_data[:true_data_splitter], train_root + "1/")
