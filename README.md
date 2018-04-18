@@ -1,4 +1,21 @@
-# Speech Commands Example
+# Vibration + Footstep
 
-This is a basic speech recognition example. For more information, see the
-tutorial at https://www.tensorflow.org/versions/master/tutorials/audio_recognition.
+## Preprocessing
+
+    $ ./preprocess.py
+
+## Spot event using Similarity
+
+    $ ./spot_event_similarity.py
+
+Correctness: ~0.5
+
+## Spot event using SVM
+
+    $ ./spot_event_svm.py
+
+Correctness: 0.865031 (dummy small set of data)
+
+## Spot event using Keyword Spotting
+
+Please read `spot_event_kws.py`.
