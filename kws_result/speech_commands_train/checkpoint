@@ -1,0 +1,6 @@
+model_checkpoint_path: "/tmp/speech_commands_train/conv.ckpt-1000"
+all_model_checkpoint_paths: "/tmp/speech_commands_train/conv.ckpt-600"
+all_model_checkpoint_paths: "/tmp/speech_commands_train/conv.ckpt-700"
+all_model_checkpoint_paths: "/tmp/speech_commands_train/conv.ckpt-800"
+all_model_checkpoint_paths: "/tmp/speech_commands_train/conv.ckpt-900"
+all_model_checkpoint_paths: "/tmp/speech_commands_train/conv.ckpt-1000"
