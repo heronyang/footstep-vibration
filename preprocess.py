@@ -4,7 +4,7 @@ import itertools
 import shutil
 import numpy as np
 import random
-from tool.raw2wav import save_wav
+from scipy.io.wavfile import write
 from config import Config as cfg
 
 DATA_ROOT = "./raw_data/"
@@ -14,17 +14,21 @@ PLOT_ROOT = "./plot/"
 TRAIN_ROOT = "./svm/train/"
 TEST_ROOT = "./svm/test/"
 PROCESSED_DATA_ROOT = "./data/"
+DATA_WAVE_ROOT = "./data/wave/"
+TMP_FILE = "/tmp/t"
 
 SINGLE_TRUE_DATA = ["heron", "harvey"]
 SINGLE_LONG_FALSE_DATA = ["uncontrol"]
 
 def main():
-    clear_dir([DATA_MERGE_ROOT, WAVE_ROOT, PLOT_ROOT, TRAIN_ROOT, TEST_ROOT])
+    clear_dir([DATA_MERGE_ROOT, WAVE_ROOT, PLOT_ROOT, TRAIN_ROOT, TEST_ROOT,
+               PROCESSED_DATA_ROOT])
     generate_merged_files(DATA_ROOT, DATA_MERGE_ROOT)
     generate_wave_files(DATA_MERGE_ROOT, WAVE_ROOT)
     generate_plots(DATA_MERGE_ROOT, PLOT_ROOT)
     generate_train_test_data(DATA_MERGE_ROOT, TRAIN_ROOT, TEST_ROOT)
     generate_processed_data(DATA_MERGE_ROOT, PROCESSED_DATA_ROOT)
+    generate_data_wave_files(PROCESSED_DATA_ROOT, DATA_WAVE_ROOT)
 
 def clear_dir(dir_list):
     for d in dir_list:
@@ -74,7 +78,7 @@ def generate_wave_files(input_dir, output_dir):
             if not os.path.exists(input_file):
                 break
             mkdir(os.path.dirname(output_file))
-            save_wav(input_file, output_file)
+            save_wav_from_file(input_file, output_file)
             print("%s => %s generated" % (input_file, output_file))
 
 def generate_plots(input_dir, output_dir):
@@ -190,6 +194,73 @@ def chop(data, window_size, step_size):
             return segments
         segments.append(data[left:right])
         left += step_size
+
+def generate_data_wave_files(input_dir, output_dir):
+
+    events = np.loadtxt(input_dir + "1")
+    unknowns = np.loadtxt(input_dir + "0")
+
+    events_splitter = int(len(events) * cfg.TRAIN_TEST_RATIO)
+    unknowns_splitter = int(len(unknowns) * cfg.TRAIN_TEST_RATIO)
+
+    save_batch_wav(
+        events[:events_splitter],
+        "%strain/event/" % output_dir
+    )
+    save_batch_wav(
+        unknowns[:unknowns_splitter],
+        "%strain/unknown/" % output_dir
+    )
+
+    save_batch_wav(
+        events[events_splitter:],
+        "%stest/event/" % output_dir
+    )
+    save_batch_wav(
+        unknowns[unknowns_splitter:],
+        "%stest/unknown/" % output_dir
+    )
+
+def save_batch_wav(data_list, output_dir):
+
+    index = 0
+    for data in data_list:
+        output_file = "%s%03d.wav" % (output_dir, index + 1)
+        mkdir(os.path.dirname(output_file))
+        save_wav(output_file, data)
+        index += 1
+        print("%s saved" % output_file)
+
+
+def save_wav(output_file, data):
+    data = (data - cfg.RANGE / 2) / (cfg.RANGE / 2)
+    scaled = np.int16(data/np.max(np.abs(data)) * 32767)
+    write(output_file, cfg.SAMPLE_RATE, scaled)
+
+def save_wav_from_file(fin_path, fout_path):
+    data = get_raw_data(fin_path)
+    scaled = np.int16(data/np.max(np.abs(data)) * 32767)
+    write(fout_path, cfg.SAMPLE_RATE, scaled)
+
+def get_raw_data(fin_path):
+    arr = []
+    count = 0
+    with open(fin_path) as fin:
+        for line in fin:
+            line = line.strip()
+            if len(line) != 4:
+                count += 1
+                continue
+            try:
+                arr.append(int(line, 16))
+            except Exception:
+                import pdb; pdb.set_trace()
+
+    data = np.array(arr)
+    print("Ignored line number is %d for %s" % (count, fin_path))
+    # Normalization
+    return (data - cfg.RANGE/2) / (cfg.RANGE/2)
+
 
 def mkdir(dir_path):
     os.makedirs(dir_path, exist_ok=True)

@@ -39,7 +39,7 @@ def get_raw_data(fin_path):
     # Normalization
     return (data - RANGE/2) / (RANGE/2)
 
-def save_wav(fin_path, fout_path):
+def save_wav_from_file(fin_path, fout_path):
     data = get_raw_data(fin_path)
     scaled = np.int16(data/np.max(np.abs(data)) * 32767)
     write(fout_path, SAMPLE_RATE, scaled)
@@ -47,4 +47,4 @@ def save_wav(fin_path, fout_path):
 if __name__ == "__main__":
 
     fin_path, fout_path = get_argv_params()
-    save_wav(fin_path, fout_path)
+    save_wav_from_file(fin_path, fout_path)
